@@ -4,14 +4,8 @@ RxJS-flavored version of HTTP fetch API for node.js.
 
 **IMPORTANT:** This library only supports RxJS 5.x.
 
-**Looking for RxJS 4.x support?** Try  [rx-fetch](https://github.com/tangledfruit/rx-fetch). (Same name but replace 'rxjs' with 'rx'.)
-
-Built on top of [isomorphic-fetch](https://github.com/matthew-andrews/isomorphic-fetch).
-
-
 ## Warnings
 
-- This adds `fetch` as a global so that its API is consistent between client and server.
 - You must bring your own ES6 Promise compatible polyfill. I suggest [es6-promise](https://github.com/jakearchibald/es6-promise).
 
 ## Installation

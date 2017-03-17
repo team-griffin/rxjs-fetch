@@ -1,11 +1,14 @@
 {
-  "name": "rxjs-fetch",
-  "version": "2.1.6",
+  "name": "@team-griffin/rxjs-fetch",
+  "version": "3.0.0",
   "description": "RxJS-flavored version of HTTP fetch API for node.js (for RxJS 5.0+)",
-  "main": "index.js",
+  "main": "lib/rx-fetch.js",
+  "jsnext:main": "lib/rx-fetch.js",
   "scripts": {
-    "test": "semistandard && mocha",
-    "test-travis": "semistandard && ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- -R spec ./test/*"
+    "prepublish": "npm run build",
+    "transpile": "babel src -d lib --copy-files",
+    "build": "npm run transpile",
+    "test": "semistandard && mocha"
   },
   "repository": {
     "type": "git",
@@ -30,6 +33,12 @@
     "url-parse": "^1.1.4"
   },
   "devDependencies": {
+    "babel-cli": "^6.24.0",
+    "babel-core": "^6.24.0",
+    "babel-eslint": "^7.1.1",
+    "babel-loader": "^6.4.1",
+    "babel-preset-es2015": "^6.24.0",
+    "babel-preset-stage-0": "^6.22.0",
     "chai": "^3.5.0",
     "co-mocha": "^1.1.3",
     "coveralls": "^2.11.9",
@@ -37,7 +46,8 @@
     "mocha": "^3.0.0",
     "nock": "^8.0.0",
     "rxjs-to-async-iterator": "^2.1.2",
-    "semistandard": "^9.0.0"
+    "semistandard": "^9.0.0",
+    "whatwg-fetch": "^2.0.3"
   },
   "engines": {
     "node": ">=4",

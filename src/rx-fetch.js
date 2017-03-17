@@ -1,13 +1,10 @@
 'use strict';
+const Rx = require('rxjs');
+const ParsedUrl = require('url-parse');
 
-var Rx = require('rxjs');
-var ParsedUrl = require('url-parse');
+const addSlashes = str => (str + '').replace(/'/g, '\\\'');
 
-var addSlashes = function addSlashes(str) {
-  return (str + '').replace(/'/g, '\\\'');
-};
-
-var RxResponse = function RxResponse(promiseResponse, recordToSubject) {
+const RxResponse = function (promiseResponse, recordToSubject) {
   this._promiseResponse = promiseResponse;
   this._recordTo = recordToSubject;
 
@@ -17,18 +14,16 @@ var RxResponse = function RxResponse(promiseResponse, recordToSubject) {
   this.headers = promiseResponse.headers;
   this.url = promiseResponse.url;
 
-  var observableText = Rx.Observable.defer(function () {
-    return Rx.Observable.fromPromise(promiseResponse.text());
-  });
+  let observableText = Rx.Observable.defer(() => Rx.Observable.fromPromise(promiseResponse.text()));
   if (this._recordTo) {
     // Note that this has the side effect of always evaluating the body text
     // of the response. We constrain that behavior to recording mode only, since
     // that would typically not occur in production code.
     observableText = observableText.publish();
-    var response = this;
+    const response = this;
     observableText.connect();
-    observableText.subscribe(function (text) {
-      response._recordTo.next('  .reply(' + response.status + ', \'' + addSlashes(text) + '\')');
+    observableText.subscribe(text => {
+      response._recordTo.next(`  .reply(${response.status}, '${addSlashes(text)}')`);
     });
   }
 
@@ -59,7 +54,7 @@ RxResponse.prototype.json = function () {
   return this.text().map(JSON.parse);
 };
 
-module.exports = function (url, options) {
+module.exports = (url, options) => {
   // At first glance, Rx.Observable.fromPromise would seem like the correct way
   // to implement this, *but* calling fetch(...) causes work to start on the
   // call right away, making this effectively a hot observable. In order to
@@ -69,34 +64,34 @@ module.exports = function (url, options) {
   // See https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/creating.md#cold-vs-hot-observables
   // for a definition of the "hot" and "cold" terms.
 
-  var didSubscribe = false;
+  let didSubscribe = false;
 
-  var result = Rx.Observable.defer(function () {
+  let result = Rx.Observable.defer(() => {
     if (didSubscribe) {
       throw new Error('can not subscribe to rxjs-fetch result more than once');
     }
 
     didSubscribe = true;
 
-    var subject = new Rx.AsyncSubject();
+    const subject = new Rx.AsyncSubject();
 
-    var recordTo = result._recordTo;
+    const recordTo = result._recordTo;
     if (recordTo) {
-      var parsedUrl = new ParsedUrl(url);
-      var pathname = parsedUrl.pathname;
-      var query = parsedUrl.query;
+      const parsedUrl = new ParsedUrl(url);
+      const pathname = parsedUrl.pathname;
+      const query = parsedUrl.query;
       parsedUrl.set('pathname', '');
       parsedUrl.set('query', '');
       parsedUrl.set('hash', '');
-      recordTo.next('nock(\'' + parsedUrl.href + '\')');
+      recordTo.next(`nock('${parsedUrl.href}')`);
 
-      var fragment = pathname;
+      let fragment = pathname;
       if (query) {
         fragment += query;
       }
 
-      var method = (options && options.method || 'get').toLowerCase();
-      var requestBody = options && options.body ? ', \'' + addSlashes(options.body) + '\'' : '';
+      const method = ((options && options.method) || 'get').toLowerCase();
+      const requestBody = (options && options.body) ? `, '${addSlashes(options.body)}'` : '';
 
       switch (method) {
         case 'get':
@@ -104,19 +99,19 @@ module.exports = function (url, options) {
         case 'put':
         case 'head':
         case 'delete':
-          recordTo.next('  .' + method + '(\'' + fragment + '\'' + requestBody + ')');
+          recordTo.next(`  .${method}('${fragment}'${requestBody})`);
           break;
         default:
-          recordTo.next('  .intercept(\'' + options.method + '\', \'' + fragment + '\'' + requestBody + ')');
+          recordTo.next(`  .intercept('${options.method}', '${fragment}'${requestBody})`);
       }
     }
 
-    fetch(url, options).then(function (promiseResponse) {
-      subject.next(new RxResponse(promiseResponse, result._recordTo));
-      subject.complete();
-    }).catch(function (err) {
-      return subject.error(err);
-    });
+    fetch(url, options)
+      .then(promiseResponse => {
+        subject.next(new RxResponse(promiseResponse, result._recordTo));
+        subject.complete();
+      })
+      .catch(err => subject.error(err));
 
     return subject;
   });
@@ -125,31 +120,29 @@ module.exports = function (url, options) {
     result._recordTo = options.recordTo;
   }
 
-  var rawThrowHttpError = function rawThrowHttpError(response) {
-    var err = new Error('HTTP Error ' + response.status + ' on ' + url + ': ' + response.statusText);
+  const rawThrowHttpError = response => {
+    let err = new Error('HTTP Error ' + response.status + ' on ' + url + ': ' + response.statusText);
     err.response = response;
     return Rx.Observable.throw(err);
   };
 
-  var throwHttpError = function throwHttpError(response) {
+  const throwHttpError = response => {
     // When recording, we need to allow the recording of the error text
     // to complete before throwing the error.
     if (result._recordTo) {
-      return response.text().switchMap(function () {
-        return rawThrowHttpError(response);
-      });
+      return response.text().switchMap(() => rawThrowHttpError(response));
     } else {
       return rawThrowHttpError(response);
     }
   };
 
-  result.recordTo = function (subject) {
+  result.recordTo = subject => {
     result._recordTo = subject;
     return result;
   };
 
-  result.failOnHttpError = function () {
-    return result.switchMap(function (response) {
+  result.failOnHttpError = () => {
+    return result.switchMap(response => {
       if (!response.ok) {
         return throwHttpError(response);
       } else {
@@ -158,12 +151,12 @@ module.exports = function (url, options) {
     });
   };
 
-  result.failIfStatusNotIn = function (acceptableStatusCodes) {
+  result.failIfStatusNotIn = acceptableStatusCodes => {
     if (!Array.isArray(acceptableStatusCodes)) {
       throw new Error('acceptableStatusCodes must be an Array');
     }
 
-    return result.switchMap(function (response) {
+    return result.switchMap(response => {
       if (acceptableStatusCodes.indexOf(response.status) === -1) {
         return throwHttpError(response);
       } else {
@@ -172,16 +165,14 @@ module.exports = function (url, options) {
     });
   };
 
-  result.text = function () {
-    return result.failOnHttpError().switchMap(function (response) {
-      return response.text();
-    });
+  result.text = () => {
+    return result.failOnHttpError()
+      .switchMap(response => response.text());
   };
 
-  result.json = function () {
-    return result.failOnHttpError().switchMap(function (response) {
-      return response.json();
-    });
+  result.json = () => {
+    return result.failOnHttpError()
+      .switchMap(response => response.json());
   };
 
   return result;

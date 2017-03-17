@@ -1,12 +1,14 @@
 'use strict';
 
+require('isomorphic-fetch');
 require('co-mocha');
 require('rxjs-to-async-iterator');
+require('babel-polyfill');
 
 const Rx = require('rxjs');
 const expect = require('chai').expect;
 const nock = require('nock');
-const rxFetch = require('../lib/rx-fetch');
+const rxFetch = require('../src/rx-fetch');
 
 const good = 'hello world. 你好世界。';
 const bad = 'good bye cruel world. 再见残酷的世界。';
@@ -161,7 +163,7 @@ describe('rxjs-fetch', () => {
 
     const nockReplay = yield nockRecord.toArray().shouldGenerateOneValue();
     expect(nockReplay).to.deep.equal([
-      "nock('http://tangledfruit.com/')",
+      "nock('http://tangledfruit.com')",
       "  .get('/succeed.txt')",
       "  .reply(200, 'hello world. 你好世界。')"]);
   });
@@ -302,7 +304,7 @@ describe('rxjs-fetch', () => {
 
       const nockReplay = yield nockRecord.toArray().shouldGenerateOneValue();
       expect(nockReplay).to.deep.equal([
-        "nock('http://tangledfruit.com/')",
+        "nock('http://tangledfruit.com')",
         "  .get('/succeed.txt')",
         "  .reply(200, 'hello world. 你好世界。')"]);
     });
@@ -318,7 +320,7 @@ describe('rxjs-fetch', () => {
 
       const nockReplay = yield nockRecord.toArray().shouldGenerateOneValue();
       expect(nockReplay).to.deep.equal([
-        "nock('http://tangledfruit.com/')",
+        "nock('http://tangledfruit.com')",
         "  .intercept('mumble', '/succeed.txt')",
         "  .reply(200, 'hello world. 你好世界。')"]);
     });
@@ -334,7 +336,7 @@ describe('rxjs-fetch', () => {
 
       const nockReplay = yield nockRecord.toArray().shouldGenerateOneValue();
       expect(nockReplay).to.deep.equal([
-        "nock('http://tangledfruit.com/')",
+        "nock('http://tangledfruit.com')",
         "  .intercept('mumble', '/succeed.txt?really=yes')",
         "  .reply(200, 'hello world. 你好世界。')"]);
     });
@@ -350,7 +352,7 @@ describe('rxjs-fetch', () => {
 
       const nockReplay = yield nockRecord.toArray().shouldGenerateOneValue();
       expect(nockReplay).to.deep.equal([
-        "nock('http://tangledfruit.com/')",
+        "nock('http://tangledfruit.com')",
         "  .get('/succeed.txt')",
         "  .reply(200, 'Shouldn\\'t we be smart about quotes?')"]);
     });
@@ -370,7 +372,7 @@ describe('rxjs-fetch', () => {
 
       const nockReplay = yield nockRecord.toArray().shouldGenerateOneValue();
       expect(nockReplay).to.deep.equal([
-        "nock('http://tangledfruit.com/')",
+        "nock('http://tangledfruit.com')",
         "  .post('/post.txt', 'Yo, what\\'s up?')",
         "  .reply(200, 'hello world. 你好世界。')"]);
     });
@@ -392,7 +394,7 @@ describe('rxjs-fetch', () => {
 
       const nockReplay = yield nockRecord.toArray().shouldGenerateOneValue();
       expect(nockReplay).to.deep.equal([
-        "nock('http://tangledfruit.com/')",
+        "nock('http://tangledfruit.com')",
         "  .get('/json.txt')",
         "  .reply(200, '{\"x\":[\"hello\", \"world\", 42]}')"]);
     });
@@ -415,7 +417,7 @@ describe('rxjs-fetch', () => {
 
       const nockReplay = yield nockRecord.toArray().shouldGenerateOneValue();
       expect(nockReplay).to.deep.equal([
-        "nock('http://tangledfruit.com/')",
+        "nock('http://tangledfruit.com')",
         "  .get('/fail.txt')",
         "  .reply(404, 'good bye cruel world. 再见残酷的世界。')"]);
     });
@@ -442,7 +444,7 @@ describe('rxjs-fetch', () => {
 
       const nockReplay = yield nockRecord.toArray().shouldGenerateOneValue();
       expect(nockReplay).to.deep.equal([
-        "nock('http://tangledfruit.com/')",
+        "nock('http://tangledfruit.com')",
         "  .get('/fail2.txt')",
         "  .reply(404, 'No such luck!')"]);
     });
