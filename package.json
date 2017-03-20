@@ -1,6 +1,6 @@
 {
   "name": "@team-griffin/rxjs-fetch",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "RxJS-flavored version of HTTP fetch API for node.js (for RxJS 5.0+)",
   "main": "lib/rx-fetch.js",
   "jsnext:main": "lib/rx-fetch.js",
