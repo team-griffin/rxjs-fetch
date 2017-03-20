@@ -13,7 +13,7 @@ const rxFetch = (url, options) => {
     return fromPromise(fetchPromise);
   });
 
-  return fetch$.share();
+  return fetch$::share();
 };
 
 const throwHttpError = (response) => {
