@@ -9,7 +9,6 @@ import rxFetch, {
   failIfStatusNotIn
 } from '../src/rx-fetch';
 
-const Rx = require('rxjs');
 const expect = require('chai').expect;
 const nock = require('nock');
 
