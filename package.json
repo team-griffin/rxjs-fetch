@@ -8,7 +8,7 @@
     "prepublish": "npm run build",
     "transpile": "babel src -d lib --copy-files",
     "build": "npm run transpile",
-    "test": "semistandard && mocha"
+    "test": "mocha --compilers js:babel-core/register"
   },
   "repository": {
     "type": "git",
@@ -28,9 +28,7 @@
   },
   "homepage": "https://github.com/tangledfruit/rxjs-fetch#readme",
   "dependencies": {
-    "isomorphic-fetch": "^2.2.1",
-    "rxjs": ">=5.0.0-beta.6",
-    "url-parse": "^1.1.4"
+    "rxjs": "5.2.0"
   },
   "devDependencies": {
     "babel-cli": "^6.24.0",
@@ -42,6 +40,7 @@
     "chai": "^3.5.0",
     "co-mocha": "^1.1.3",
     "coveralls": "^2.11.9",
+    "isomorphic-fetch": "^2.2.1",
     "istanbul": "^0.4.4",
     "mocha": "^3.0.0",
     "nock": "^8.0.0",
