@@ -17,13 +17,14 @@ const rxFetch = (url, options) => {
 };
 
 const throwHttpError = (response) => {
-  let err = new Error('HTTP Error ' + response.status + ' on ' + url + ': ' + response.statusText);
+  const err = new Error(`HTTP Error ${response.status} on ${response.url}: ${response.statusText}`);
   err.response = response;
   return _throw(err);
 };
 
 export const failOnHttpError = function() {
-  return this::switchMap(response => {
+  // eslint-disable-next-line no-invalid-this
+  return this::switchMap((response) => {
     if (!response.ok) {
       return throwHttpError(response);
     }
@@ -33,6 +34,7 @@ export const failOnHttpError = function() {
 };
 
 export const failIfStatusNotIn = function(acceptableStatusCodes) {
+  // eslint-disable-next-line no-invalid-this
   return this::switchMap((response) => {
     if (acceptableStatusCodes.indexOf(response.status) === -1) {
       return throwHttpError(response);
@@ -43,12 +45,14 @@ export const failIfStatusNotIn = function(acceptableStatusCodes) {
 };
 
 export const parseText = function() {
+  // eslint-disable-next-line no-invalid-this
   return this::switchMap((response) => {
     return fromPromise(response.text());
   });
 };
 
 export const parseJson = function() {
+  // eslint-disable-next-line no-invalid-this
   return this::parseText()::map((text) => {
     return JSON.parse(text);
   });

@@ -7,8 +7,11 @@
   "scripts": {
     "prepublish": "npm run build",
     "transpile": "babel src -d lib --copy-files",
+    "lint:js": "eslint -c ./config/.eslintrc.js 'src/**/*.js'",
+    "lint:js:fix": "eslint --fix -c ./config/.eslintrc.js 'src/**/*.js'",
     "build": "npm run transpile",
-    "test": "mocha --compilers js:babel-core/register"
+    "test": "mocha --compilers js:babel-core/register",
+    "dockerfile:ci": "dockerscript ./docker/ci/dockerfile.js ./docker/ci/Dockerfile"
   },
   "repository": {
     "type": "git",
@@ -21,16 +24,17 @@
     "http",
     "fetch"
   ],
-  "author": "tangledfruit <code@tangledfruit.com>",
+  "author": "Joshua Thornton <joshua.thornton@heg.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tangledfruit/rxjs-fetch/issues"
+    "url": "https://github.com/team-griffin/rxjs-fetch/issues"
   },
-  "homepage": "https://github.com/tangledfruit/rxjs-fetch#readme",
+  "homepage": "https://github.com/team-griffin/rxjs-fetch",
   "dependencies": {
     "rxjs": "5.2.0"
   },
   "devDependencies": {
+    "@team-griffin/eslint-config": "^1.0.0",
     "babel-cli": "^6.24.0",
     "babel-core": "^6.24.0",
     "babel-eslint": "^7.1.1",
@@ -40,6 +44,9 @@
     "chai": "^3.5.0",
     "co-mocha": "^1.1.3",
     "coveralls": "^2.11.9",
+    "dockerscript": "^0.0.6",
+    "eslint": "^3.18.0",
+    "eslint-plugin-flowtype": "^2.30.4",
     "isomorphic-fetch": "^2.2.1",
     "istanbul": "^0.4.4",
     "mocha": "^3.0.0",
@@ -52,13 +59,5 @@
     "node": ">=4",
     "npm": ">=3"
   },
-  "engineStrict": true,
-  "semistandard": {
-    "globals": [
-      "before",
-      "describe",
-      "fetch",
-      "it"
-    ]
-  }
+  "engineStrict": true
 }
